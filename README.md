@@ -6,5 +6,13 @@ We will upload all of our project codes and synthetic dataset after the final su
 
 Thank you for visiting our site.
 
+### Screenshot of MedCV software:
+![Test Image 1](https://github.com/ashischanda/MedCV/blob/master/images/cover.png)
 
-![Test Image 4](https://github.com/ashischanda/MedCV/blob/master/images/cover.png)
+
+### Table view:
+![Test Image 2](https://github.com/ashischanda/MedCV/blob/master/images/table_panel.png)
+
+
+### Claim view:
+![Test Image 3](https://github.com/ashischanda/MedCV/blob/master/images/claim%20view.png)
