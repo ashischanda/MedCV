@@ -25,10 +25,12 @@ Figure: A screenshot of MedCV with four views: (a) Query view: user writes a que
 
 ### Table view:
 ![Test Image 2](https://github.com/ashischanda/MedCV/blob/master/images/table_panel.png)
+
 Figure: Showing table panel with code filtering option for "965" 
 
 ### Claim view with patient timeline:
-![Test Image 3](https://github.com/ashischanda/MedCV/blob/master/images/claim%20view.png)
+![Test Image 3](https://github.com/ashischanda/MedCV/blob/master/images/medcv_claimview.png)
+
 Figure: Claim view and patient view: Claim view shows 50 example claims for recently selected code by a user from table view; Patient view presents timeline for the selected claim from claim view. Here, user selects claim #48 from claim view and patient view shows the patient timeline of the selected claim #48 and highlights in blue circle. The ICD-9 diagnosis and CPT codes are marked with prefix "d_" and "h_", respectively.
 
 
