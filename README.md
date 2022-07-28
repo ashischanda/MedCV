@@ -19,7 +19,7 @@ Figure: Skip-gram model architecture is shown for a claim data [The claim code d
 Figure: The workflow of our proposed MedCV software
 
 ### Screenshot of MedCV software:
-![Test Image 1](https://github.com/ashischanda/MedCV/blob/master/images/med_cover.png)
+![Test Image 1](https://github.com/ashischanda/MedCV/blob/master/images/medcv_cover.png)
 
 Figure: A screenshot of MedCV with four views: (a) Query view: user writes a query, such as a patient treatment or a medical code, (b): Table view: shows a ranked list of related medical codes based on two different metrics, (c) Projection view: displays medical code relationships in a 2D view responsive to user interaction, (d): Selected code view: keeps a record of medical codes selected by the user.
 
