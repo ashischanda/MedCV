@@ -1,0 +1,570 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>MedCV</title>
+    <link rel="stylesheet" href="css/scatter.css" charset="utf-8">	
+	<link href="css/easy-autocomplete.min.css" rel="stylesheet" type="text/css">
+	
+	<!-- This file is for auto  suggestion in text field               -->
+	<script src="js/jquery-1.11.2.min.js"></script>
+	<script src="js/jquery.easy-autocomplete.min.js" type="text/javascript" ></script>
+	<!-- ********************************************************  -->
+	
+	<!-- This file is for set               -->
+	<script src="js/setOps.js"></script>
+	
+	
+	<!-- This file is for reading csv file  ********************   -->
+	<script type="text/javascript" src="js/jquery.csv/src/jquery.csv.js"></script>
+	<!-- *******************************************************   -->
+	
+	<!-- This file is for t-SNE ********************   -->
+	<script src="js/tsne.js" charset="utf-8"></script>
+	
+    <link href="css/tabulator_simple.min.css" rel="stylesheet">
+  
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.4.2/js/tabulator.min.js"></script>  
+  </head>
+
+<style>
+  body {
+    font: 11px monospace;
+  }
+  
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+  
+  .dot {
+    <!-- stroke: #000; -->
+  }
+  
+  
+  .tooltip {
+    position: absolute;
+    width: 200px;
+    height: 28px;
+    pointer-events: none;
+  }
+  
+  svg {
+    border-style: solid;
+	 border-width: 1px;  
+  }
+  
+  g {
+    border-style: solid;
+  }
+  
+  p {
+    border-style: solid;
+    border-width: 1px;  
+  }
+  h1{
+	color: blue;
+  }
+  
+ 
+</style>
+  <body>	
+    <h1>MedCV: Patient cohort identification software </h1>
+	<input type="text"   name="codelist"    id="codevalue" value="Type a code or treatment name" size="80">
+	<br>
+	
+    # top related codes:   <input type="text"  value="30" size="1" id ="listItems" />
+	Code type:	<input id="checkBox" type="radio" value="d" name="codetype"> ICD9-D 
+				<input id="checkBox" type="radio" value="p" name="codetype"> ICD9-P 
+				<input id="checkBox" type="radio" value="h" name="codetype" checked="checked" > CPT
+				
+	<input type="button" value="view"   id="view"  style=" font-size:11px; font: monospace;" />
+	<input type="button" value="back"   id="back"  style=" font-size:11px; font: monospace;"/>
+	<input type="button" value="reset"  id="reset" style=" font-size:11px; font: monospace;"/>
+    <br>
+	<p id='data_loading_message'> Data is loading ... Thank you for your patience.</p> 
+
+
+	<!-- *************  TABLE VIEW  **************************  -->
+	<div id = "table_panel_div" style="position: absolute;  width: 560px; font-size:11px; font: monospace; border:1px solid black; ">
+	    <span  style="color:blue;  font-size:16px;  padding: 5px; "> <strong> <b>Table panel:</b> </strong> </span> </br>
+	    &nbsp; Filter by code: <input id="filter-value" type="text" placeholder="write a code " style=" font-size:11px; font: monospace;">
+		            		   <input id="filter-clear" type="button" value="Clear"             style=" font-size:11px; font: monospace;" >
+		<div id = "table_panel" style='font-size:11px; font: monospace; '>Loading Data</div>
+		</div>
+    </div>
+	<!-- ***************************************  -->
+	
+	<!-- ************ PROJECTION/ SCATTER/ t-SNE  VIEW *** -->
+	<div id="scatter" style="left: 580px; width: 300px;  position: absolute;"></div>
+	<!-- ************************************************  -->
+	
+ 
+    <!-- ************ SELECTED TABLE VIEW  *********************  -->	
+	<div style="position: absolute; top: 400px;  width: 560px; border:1px solid black; ">
+	<span  style="color:blue; font-size:16px; padding: 5px;"> <b> Selected code list panel: </b> </span><br>
+		<div id="output_panel" style="padding: 3px;  font-size:11px; font: monospace;" >
+		</div>
+	</div>
+	<!-- *************************************** -->
+	<div id="save_panel" style="position: absolute; top: 545px; padding: 1px;">  
+        <button id="download_button" style=" font-size:11px; font: monospace;" >Save result</button>  
+		<!-- <button id="model_button" style=" font-size:11px; font: monospace;" >Update SCR</button> -->
+		<!-- <button id="model_button" style=" font-size:11px; font: monospace;" >Check candidate patient</button>  -->
+		 <span id="selected_claims_txt" style=" font-size:11px; font: monospace;" > Selected patient: 0</span> 
+    </div>
+	<!-- *************************************** -->	
+
+    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script type="text/javascript" src="js/made/tsne_view.js" charset="utf-8"></script>
+	<script type="text/javascript" src="js/made/scatter.js" charset="utf-8"></script>
+	
+	<!-- ***************  Auto-suggestion box  ********************** -->
+	<script>		
+	// Tutorial: http://easyautocomplete.com/guide#sec-templates
+	var options = {
+		url: "js/code_name.json",  		//they needed json file format // LOADING CODE NAME FOR AUTO SUGGESTION WHEN USER TYPE A CODE
+		getValue: "code",
+		
+		list: { maxNumberOfElements: 10, match: {enabled: true}}
+	};
+
+	$("#codevalue").easyAutocomplete( options );
+	</script>
+	
+	
+	
+	<script type="text/javascript">  
+	// taking a dictionary
+	// key is claimID, value is 1
+	// If a code is deleted, then 
+	var global_selected_claims = new Object();     
+	var global_selected_patients = new Object(); 
+	var global_selected_claim_count = 0;
+	var global_selected_patient_count = 0;
+	var actual_global_selected_claim_count = 0;
+	var actual_global_selected_patient_count = 0;
+	
+
+	
+	
+		
+	// FILTERING table values IN TABLE VIEW
+	// *******************************************************
+	//Define variables for input elements
+	var valueEl = document.getElementById("filter-value");
+	//Trigger setFilter function with correct parameters
+	function updateFilter(){
+	  var filterVal = "code_name";
+	  var typeVal = "like";
+	  valueEl.disabled = false;
+	  if(filterVal){
+		$("#table_panel").tabulator("setFilter", filterVal,typeVal, valueEl.value  );
+		//table.setFilter(filterVal,typeVal, valueEl.value);
+	  }
+	}
+	//Update filters on value change
+	document.getElementById("filter-value").addEventListener("keyup", updateFilter);
+	
+	//Clear filters on "Clear Filters" button click
+	document.getElementById("filter-clear").addEventListener("click", function(){
+	  valueEl.value = "";
+	  $("#table_panel").tabulator("clearFilter" );
+	});
+	// *******************************************************
+    // END OF FILTERING
+
+
+
+	// *******************************************************
+    $("#table_panel").tabulator({     
+      //layout:"fitDataFill", //fit columns to width of table (optional)
+	  height:"200px",
+	  style: 'font: monospace; font-size:11px;  ',
+      //pagination:"local", //'local' or 'remote'. local loads all the data and then paginate while remote loads upon ajax call
+	  //paginationSize:7,
+	  //tooltips:true, // set tooltips to true or false     
+      resizableRows: false, // allows rows to be resize
+	  resizableColumns: false, 
+	  responsiveLayout:"hide",  //By setting the responsiveLayout option to "hide" . I used to hide "type" in table column 
+      
+
+      initialSort:[
+        {column:"cosine", dir:"desc"},
+      ],
+	 		
+        columns:[ //Define Table Columns
+			{title:"Status", headerTooltip:"click here to select action",field:"status_flag", editor:"select", headerSort:false, responsive:0 , //never hide this column  // never sort by header
+				editorParams:{"Select":"Select", "Add":"Add","Not":"Not", "Explore": "Explore"},
+				frozen:true, 
+
+				cellEdited:function(cell)  // calling explore or Adding function
+				{
+					var cellValue = cell.getValue();
+					row = cell.getRow();
+					ii = row.getIndex();
+					//alert("cell clicked - " + cellValue ); 
+					var c_name = row.getData().code_name;
+					var freq1 = row.getData().freq1;
+					var freq2 = row.getData().freq2;
+					var c_des = row.getData().descript;
+					var _id = row.getData().id;
+					// *************************************************************************
+					if (cellValue=="Add"){
+						var get_code_claimID = row.getData().code_claimID ;	
+						var get_code_patientID = row.getData().patientID ;
+
+						cell.getRow().getElement().css({ 
+							"background-color": "#EFFAFC"
+							});
+						//$("#output_panel").tabulator("addRow", {id: _id, select: true, code: c_name, description: c_des, comment:"write your note", code_claimID: get_code_claimID} );
+						$("#output_panel").tabulator("addRow", {id: _id, select: true, code: c_name, freq1: freq1, freq2: freq2, description: c_des, comment:"write your note", code_claimID: get_code_claimID, patientID: get_code_patientID} );
+
+						//******************************************************
+						
+						for(var kk =0 ; kk< get_code_claimID.length; kk++){
+							var key = get_code_claimID[kk];
+							
+							if (global_selected_claims.hasOwnProperty(key)) {
+								global_selected_claims[ key ] += 1;
+							}
+							else{
+								global_selected_claims[ key ] = 1;
+							}
+						}
+						
+						// couting keys that have value > 0
+						var selected_claim_count = 0;
+						for (var key in global_selected_claims) {
+							if (global_selected_claims.hasOwnProperty(key)) {
+								if ( global_selected_claims[key] >0)
+								 selected_claim_count+=1;
+							}
+						}
+						
+						//******************************************************
+						//******************************************************
+						for(var kk =0 ; kk< get_code_patientID.length; kk++){
+							var key = get_code_patientID[kk];	
+							if (global_selected_patients.hasOwnProperty(key)) {
+								global_selected_patients[ key ] += 1;
+							}
+							else{
+								global_selected_patients[ key ] = 1;
+							}
+						}
+						
+						// couting keys that have value > 0
+						var selected_p_count = 0;						
+						for (var key in global_selected_patients) {
+							if (global_selected_patients.hasOwnProperty(key)) {
+								if ( global_selected_patients[key] >0)
+								 selected_p_count+=1;
+							}
+						}
+						//******************************************************
+						//******************************************************
+						if (global_selected_patient_count==0){
+					    	global_selected_patient_count = selected_p_count;
+					    	actual_global_selected_patient_count = selected_p_count;
+
+					    }
+					    else{   // Since we don't have all claimID for a code with freq2>10K, we take a ratio
+					    	var difference = selected_p_count - actual_global_selected_patient_count;
+					    	var	difference_after_applying_ratio = (difference*freq1)/ get_code_patientID.length;
+					    	global_selected_patient_count =  Math.ceil( difference_after_applying_ratio ) + actual_global_selected_patient_count;
+					    	actual_global_selected_patient_count = selected_p_count;
+					    }
+						
+					    if (global_selected_claim_count==0){
+					    	global_selected_claim_count = selected_claim_count;
+					    	actual_global_selected_claim_count= selected_claim_count;
+					    }
+					    else{   // Since we don't have all claimID for a code with freq2>10K, we take a ratio
+
+						var difference = selected_claim_count - actual_global_selected_claim_count;
+						//alert(difference);
+						//alert(get_code_claimID.length);
+					    var	difference_after_applying_ratio = (difference*freq2)/ get_code_claimID.length;
+					    global_selected_claim_count =  Math.ceil( difference_after_applying_ratio) + actual_global_selected_claim_count;
+						actual_global_selected_claim_count= selected_claim_count;
+						}
+
+
+
+						document.getElementById("selected_claims_txt").innerHTML = " Selected patient: "+ global_selected_patient_count ;
+						//******************************************************
+						
+						
+					}
+					// *************************************************************************
+					if(cellValue=="Explore"){
+						var url = window.location.href;
+						var newWindow = window.open("claim_view", "_blank");   // obening in a new window
+						//var newWindow = window.open("claim_view", "_blank", "scrollbars=yes,resizable=yes,width=1000,height=650");   // obening in a new window
+	
+					    //pass data to a popup window I created using window.open()?												
+						newWindow.cosine_code = cosine_code;
+						newWindow.cosine_codevector = cosine_codevector;
+						newWindow.cosine_codeDescription = cosine_codeDescription;
+						var givenCode = document.getElementById("codevalue").value;
+						var n = givenCode.indexOf("-");          // Deleting code description from Textfield
+						if (n>0)
+							givenCode = givenCode.slice(0, n);
+						newWindow.query_code = givenCode;
+						newWindow.selected_code = "h_"+ c_name;
+						//newWindow.selected_code = "h_96523";  // For now, I assume user is clicking on this point only
+						
+						
+						// The problem is that I am not seeing any cluster
+						// So, we plan to take only "cpt" code vector of a claim, or only "dia" code
+						// at first, I took claim without cpt Type II. h_with_letters
+						//           I saw some claim repeats
+						//           Now, I took all type of cpt.  But there is a problem. My Code vectors are only cpt type I
+						//           Now, I ignore same claims.
+						// Problem solved: the problem was not in code type
+						//                 the problem was I took 100 points (or claim) for a small space of t-SNE
+						//                 Hence, t-SNE didn't work well. Then, I took 50 points.
+
+						newWindow.claimIDlist = row.getData().code_claimID;
+						newWindow.common_claimID = row.getData().common_claimID;
+						
+						
+						
+					}
+					if (cellValue=="Not"){
+						// Making "transparent" is one option
+						/* cell.getRow().getElement().css({ 
+							"background-color": "#848383"
+							});
+						*/	
+					}
+					
+					//$("#output_panel").tabulator("deleteRow", r.getIndex() );
+				}
+			},
+						
+			{title:"Code", headerTooltip:"Medical code",  field:"code_name", width: 60, frozen:true, headerSort:false,  responsive:0, //never hide this column // *** HIDE THIS ***
+				// *************************************************************************
+				// double click on code name
+				cellDblClick:function(e, cell){
+					//e - the tap event object
+					//cell - cell component
+					row = cell.getRow();
+					var c_des = row.getData().descript;
+					
+					var strconfirm = confirm("Clicking on a code will show top related code list for this code, "+ cell.getValue() + ". \nAre you sure you want to see it's related code?");
+					if (strconfirm == true) {                   
+						// *************************************
+						// getting selected radio button value
+						var codetype = "";
+						var ele = document.getElementsByName('codetype'); 
+
+						for(i = 0; i < ele.length; i++) { 
+								if(ele[i].checked) 
+								 codetype = ele[i].value; 
+						}
+						// *************************************
+
+						if(codetype=="h")
+							document.getElementById("codevalue").value = "h_"+ cell.getValue() +"-"+c_des;
+						else if(codetype=="p")
+							document.getElementById("codevalue").value = "p_"+ cell.getValue() +"-"+c_des;
+						else
+							document.getElementById("codevalue").value = "d_"+ cell.getValue() +"-"+c_des;
+											
+						document.getElementById("scatter").innerHTML = "";
+						$("#table_panel").tabulator("clearData" );       //Clear table on button click
+						myData =loadCosineSimilarityData();
+						
+						//load sample data into the table
+						$("#table_panel").tabulator("setData", myData);      
+						initialize(myData );
+					}
+					
+				},	
+			}, //frozen column
+            {title:"CDV", headerTooltip:"Cosine distance value", field:"cosine" , responsive:0}, //never hide this column
+			{title:"PMI",    headerTooltip:"Pointwise mutual information value", field:"pmi", responsive:0}, //never hide this column
+			//{title:"SCR",    headerTooltip:"Suggested code rank", field:"scr", responsive:0}, //never hide this column
+			{title:"PF",  headerTooltip:"Medical code frequency in all patients", field:"freq1", responsive:0}, //never hide this column  //align:"left", formatter:"progress", 
+			{title:"CF",  headerTooltip:"Medical code frequency in all claims", field:"freq2", responsive:0}, //never hide this column 
+			{title:"BCF",  headerTooltip:"Both query and this row code frequency in claims", field:"freq3", responsive:0}, //never hide this column
+			{title:"Description", field:"descript", width: 250, headerSort:false , responsive:0}, //never hide this column  // never sort by header
+            {title:"patientlist", field:"patientID", responsive:2}, //hide this column first 
+			{title:"claimlist", field:"code_claimID", responsive:2}, //hide this column first // Use this for storing claimlist ID
+            {title:"common_claimID", field:"common_claimID", responsive:2}, //hide this column first // Use this for storing claimlist ID
+			
+			{title:"Last", field:"type", responsive:2,                      //hide this column first. Use this column for background color
+				// *************************************************************************
+				formatter: function(cell, formatterParams) {
+				  var cellValue = cell.getValue();
+				  var getColor =  myColor[ legend_code_text.indexOf( cellValue ) ];
+				  cell.getRow().getElement().css({ 
+							"background-color": getColor
+							});
+					
+				  return cellValue;
+				}
+			},
+        ],        
+    });
+	// *******************************************************
+	
+	// *******************************************************
+	$("#output_panel").tabulator({     
+      height:"120px",
+      movableColumns: false, // allows columns to be moved around
+      resizableRows: false, // allows rows to be resize'
+	  resizableColumns: false, 
+	  history:true,
+	  responsiveLayout:"hide",  //By setting the responsiveLayout option to "hide"
+        columns:[ //Define Table Columns
+			{title:" ", field:"select", hozAlign:"center", formatter:"tickCross" , headerSort:false,  responsive:0,
+				// *************************************************************************
+				cellClick:function(e, cell)
+				{ 
+					var strconfirm = confirm("Are you sure want to delete this code from your selected code list?");
+					if (strconfirm == true) {   
+						row = cell.getRow();
+						
+						//row.getData().col    // got column value
+						var c_id = row.getData().id;
+						var freq1= row.getData().freq1;
+
+						//alert( c_id +" cell clicked - " + row.getIndex() ); 
+						
+						// Deleting the current row based on its Index
+						$("#output_panel").tabulator("deleteRow", row.getIndex() );
+						// Updating deleted row in table_panel with status "Not"
+						$("#table_panel").tabulator("updateData", [{id:c_id , status_flag:"Not"}] );
+						
+						// ****************** Updating selected claimID 
+						var get_code_claimID = row.getData().code_claimID ;
+						for(var kk =0 ; kk< get_code_claimID.length; kk++){
+							var key = get_code_claimID[kk];
+							// ***** decrement dict values, we can't delete key
+							if (global_selected_claims.hasOwnProperty(key)) {
+								global_selected_claims[ key ] -= 1;
+							}
+						}
+						// couting keys that have value > 0
+						var selected_claim_count = 0;
+						for (var key in global_selected_claims) {
+							if (global_selected_claims.hasOwnProperty(key)) {
+								if ( global_selected_claims[key] >0)
+								 selected_claim_count+=1;
+							}
+						}
+						// ****************************************************
+						// ****************** Updating selected patientID 
+						var get_code_patientID = row.getData().patientID ;
+						for(var kk =0 ; kk< get_code_patientID.length; kk++){
+							var key = get_code_patientID[kk];
+							// ***** decrement dict values, we can't delete key
+							if (global_selected_patients.hasOwnProperty(key)) {
+								global_selected_patients[ key ] -= 1;
+							}
+						}
+						// couting keys that have value > 0
+						var selected_p_count = 0;
+						for (var key in global_selected_patients) {
+							if (global_selected_patients.hasOwnProperty(key)) {
+								if ( global_selected_patients[key] >0)
+								 selected_p_count+=1;
+							}
+						}
+						
+
+						if (global_selected_patient_count==0){
+					    	global_selected_patient_count = selected_p_count;
+					    	actual_global_selected_patient_count = selected_p_count;
+
+					    }
+					    else{   // Since we don't have all claimID for a code with freq2>10K, we take a ratio
+					    	var difference = selected_p_count - actual_global_selected_patient_count;
+					    	var	difference_after_applying_ratio = (difference*freq1)/ get_code_patientID.length;
+					    	global_selected_patient_count =  Math.ceil( difference_after_applying_ratio ) + actual_global_selected_patient_count;
+					    	actual_global_selected_patient_count = selected_p_count;
+					    }
+						
+					    if (global_selected_claim_count==0){
+					    	global_selected_claim_count = selected_claim_count;
+					    	actual_global_selected_claim_count= selected_claim_count;
+					    }
+					    else{   // Since we don't have all claimID for a code with freq2>10K, we take a ratio
+
+						var difference = selected_claim_count - actual_global_selected_claim_count;
+						//alert(difference);
+						//alert(get_code_claimID.length);
+					    var	difference_after_applying_ratio = (difference*freq2)/ get_code_claimID.length;
+					    global_selected_claim_count =  Math.ceil( difference_after_applying_ratio) + actual_global_selected_claim_count;
+						actual_global_selected_claim_count= selected_claim_count;
+						}
+
+
+
+
+
+
+
+
+
+
+
+						//document.getElementById("selected_claims_txt").innerHTML = " Selected patient cohort size: "+ global_selected_patient_count +"; claim: " + global_selected_claim_count;
+						document.getElementById("selected_claims_txt").innerHTML = " Selected patient: "+ global_selected_patient_count ;
+						// ************************************
+					}
+				} 
+			},
+            {title:"Code", field:"code", responsive:0}, 
+			{title:"PF", field:"freq1", headerSort:false, responsive:0},
+			{title:"CF", field:"freq2", headerSort:false, responsive:2}, //hide this column first
+			{title:"Description", field:"description", width:200, editor:"input" , headerSort:false, responsive:0},
+            {title:"User's comment/note", field:"comment", width:450, editor:"input" , headerSort:false, responsive:0},
+			{title:"IDD", field:"id", width:350, responsive:2 }, //hide this column first
+			{title:"CCD", field:"code_claimID", width:150, responsive:2 }, //hide this column first
+			{title:"PID", field:"patientID", width:150, responsive:2 } //hide this column first
+			// giving edit option:  editor:"input" 
+			// disable sorting and remove sort arrows? headerSort:false
+            
+        ], 
+
+    });
+   
+	/* ***************** customize table output for downloading ******************* */
+	/* ******** because, we don't want to download select, ID cloumns ************ */
+	var fileFormatter = function(columns, data, options, setFileContents){
+		//columns - column definition array for table (with columns in current visible order);
+		//data - currently displayed table data
+		//options - the options object passed from the download function
+		//setFileContents - function to call to pass the formatted data to the downloader
+
+		//create a list of all name fields
+		var names = [];
+		names.push("code,code description,users comment");
+		data.forEach(function(row){
+			//var myrow = row.code+","+row.description+","+row.comment+","+row.code_claimID;
+			var myrow = row.code+","+row.description+","+row.comment;
+
+			names.push(myrow);
+		});
+		
+		//trigger file download, passing the formatted data and mime type
+		setFileContents(names.join("\n"), "text/plain");
+	}
+
+	//trigger file download
+    $("#download_button").on("click", function(){
+        $("#output_panel").tabulator("download", fileFormatter, "selected_code_list.csv");
+    });
+
+    </script>  
+
+  </body>
+</html>
