@@ -4,7 +4,7 @@ if($mysqli->connect_error) {
   exit('Could not connect');
 }
 
-$sql = "SELECT code_length, claims FROM code_table WHERE code_id = ? ";       // LIKE %?%");   didn't work
+$sql = "SELECT length, patientid FROM code_patient_table WHERE code = ? ";       // LIKE %?%");   didn't work
 
 $stmt = $mysqli->prepare($sql);
 

@@ -4,7 +4,7 @@ if($mysqli->connect_error) {
   exit('Could not connect');
 }
 
-$sql = "SELECT code_length, claims FROM code_table WHERE code_id = ? ";       // LIKE %?%");   didn't work
+$sql = "SELECT codes FROM claim_table WHERE claim_id = ? ";       // LIKE %?%");   didn't work
 
 $stmt = $mysqli->prepare($sql);
 
@@ -13,13 +13,13 @@ $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("s",    $_GET['q']); 
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($code_length, $claims);
+$stmt->bind_result($patient_id);
 
 $stmt->fetch();
 $stmt->close();
 
 // Concatenation Of String 
-$c = $code_length. "=".$claims; 
+$c = $patient_id; 
   
 echo $c ;
 
