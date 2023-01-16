@@ -39,9 +39,10 @@ Please acknowledge the following work in papers or derivative software:
 
 ```
 @inproceedings{chanda2022medcv,
-  title={MedCV: An interactive visualization system for patient cohort identifications from medical claim dataset},
+  title={MedCV: An Interactive Visualization System for Patient Cohort Identification from Medical Claim Data},
   author={Chanda, Ashis Kumar and Egleston, Brian L and Bai, Tian and Vucetic, Slobodan},
   booktitle={Proceedings of the 31st ACM International Conference on Information \& Knowledge Management},
+  pages={4828--4832},
   year={2022}
 }
 
