@@ -1,0 +1,100 @@
+div.tbl {
+    overflow: auto;
+    height: 600px;
+    width: 500px;
+    position: absolute;
+    left: -500px;
+    top: -600px;
+}
+
+table.tbl {
+    display: none;
+    background-color: DarkGrey;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+}
+
+.clstr {
+    font-weight: 100;
+    font-family: "Helvetica", Arial, sans-serif;
+    font-size: 14px;
+    text-anchor: middle;
+}
+
+rect {
+    fill: transparent;
+    shape-rendering: crispEdges;
+}
+
+.ptr {
+    fill: #000;
+    fill-opacity: +1;
+}
+
+polyline {
+    fill: #000;
+    fill-opacity: +1;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.1);
+    shape-rendering: crispEdges;
+}
+
+.axisLine {
+    fill: none;
+    shape-rendering: crispEdges;
+    stroke: rgba(0, 0, 0, 0.5);
+    stroke-width: 2px;
+}
+
+.box {
+    fill-opacity: +0.6;
+    visibility: visible;
+}
+
+.dot {
+    fill-opacity: +0.6;
+    /*switch: +1; /* 1: rendered */
+    /* 0: not rendered */
+    visibility: visible;
+}
+
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+}
+
