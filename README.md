@@ -1,9 +1,6 @@
 # MedCV
-MedCV: An interactive visualization system for patient cohort identifications from medical claim dataset
 
-Code for the paper
-
-[CIKM 2022 conference: MedCV: An Interactive Visualization System for Patient Cohort Identification from Medical Claim Data](https://dl.acm.org/doi/abs/10.1145/3511808.3557157)
+Code for the CIKM 2022 conference paper: [MedCV: An Interactive Visualization System for Patient Cohort Identification from Medical Claim Data](https://dl.acm.org/doi/abs/10.1145/3511808.3557157)
 
 ### Explaining our MedCV software:
 ![Test Image 1.0](https://github.com/ashischanda/MedCV/blob/master/images/medcv_claim_data_example.png)
