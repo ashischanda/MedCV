@@ -1,0 +1,147 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>MedCV</title>
+    <link rel="stylesheet" href="css/scatter.css" charset="utf-8">	
+	<script src="js/jquery-1.11.2.min.js"></script>
+	<script src="../js/tsne.js" charset="utf-8"></script>
+	
+  </head>
+
+<style>
+  body {
+    font: 11px monospace;
+  }
+  
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+  
+  .dot {
+    <!-- stroke: #000; -->
+  }
+  
+  
+  .tooltip {
+    position: absolute;
+    width: 200px;
+    height: 28px;
+    pointer-events: none;
+  }
+  
+  svg {
+    border-style: solid;
+  }
+  
+  g {
+    border-style: solid;
+  }
+  
+  p {
+    border-style: solid;
+    border-width: 1px;  
+  }
+  
+  form {
+    font-size: 150%;
+  }
+  
+
+  .slidecontainer {
+    width: 100%;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 200px;
+    height: 10px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+</style>
+  <body>
+	<!-- 
+	<input type="button" value="view"       id="view"/>
+	// This button is used to call draw_orig() method
+	// I called this method by default
+	
+	<input id="btn_patient" type="button" value="see patient view">
+	// This button is used to call for show_visualize method [ patinet_view ]
+	-->
+	<div id="scatter" style="left: 2px; width: 300px; position: absolute;"></div>
+	<div style="left: 30px; top: 280px; position: absolute;">
+	<b>Claim view</b> [Example claims with recent selected code]<br>
+	[Click on a claim circle to see the claim in patient timeline]
+	</div>
+    <div id="scatter_patient_timeline" style="left: 500px; position: absolute;" ></div>
+	<div id="patient_timeline_code"   style="left: 500px; top: 350px; position: absolute;">  </div>
+	
+	<div id="patient_timeline_title"   style="left: 700px; top: 280px; position: absolute;"> </div>
+	<div id="patient_timeline_total_visit"   style="left: 700px; top: 300px; position: absolute;"> </div>
+	
+  <div id="patient_timeline_claimlist"   style="left: 850px; top: 350px; position: absolute;"> </div>
+
+
+	<div style="left: 10px; top: 320px; position: absolute;">
+	The diagnosis codes are grouped based on ICD-9 struture [<a href="https://en.wikipedia.org/wiki/List_of_ICD-9_codes" target="_blank">more</a>].
+    </div>
+	
+	<script type="text/javascript">    
+	cosine_codeDescription = window.cosine_codeDescription ;
+	cosine_code = window.cosine_code;
+	cosine_codevector = window.cosine_codevector;
+	claimIDlist = window.claimIDlist ; 
+	query_code = window.query_code;
+	selected_code = window.selected_code;
+	common_claimID = window.common_claimID;
+	
+	//console.log("index");
+	//console.log(claimIDlist);
+	// after this line, you are loading scatter.js file
+	/*
+	for (var ii =0; ii< 10; ii++){
+		console.log(cosine_code[ii] );
+	}
+	*/
+
+	
+	</script>
+	
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="js/patient_view.js" charset="utf-8"></script>
+	<script src="js/claim_scatter.js" charset="utf-8"></script>
+  
+
+  </body>
+</html>
